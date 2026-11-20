@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Im'diva — Каталог</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #25D366;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .full-screen-container {
+            width: 100%;
+            max-width: 600px;
+            min-height: 100vh;
+            background: #ffffff;
+            box-sizing: border-box;
+            padding: 16px 16px 100px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ВЕРХНЯЯ ГОРИЗОНТАЛЬНАЯ ПАНЕЛЬ КАТЕГОРИЙ (маленькие квадратики) */
+        .top-categories-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            scrollbar-width: none; /* Скрыть скроллбар для красоты */
+        }
+        .top-categories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .top-cat-item {
+            flex: 0 0 auto;
+            width: 70px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .top-cat-box {
+            width: 70px;
+            height: 70px;
+            border-radius: 14px;
+            background: #1e293b; /* Тот самый темно-синий цвет из макета */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+
+        .top-cat-item.active .top-cat-box {
+            border-color: #25D366;
+            transform: scale(1.05);
+        }
+
+        .top-cat-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .top-cat-title {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 6px;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ОСНОВНАЯ СЕТКА ТОВАРОВ НА ВЕСЬ ЭКРАН (большие квадраты) */
+        .products-grid-fullscreen {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            flex-grow: 1;
+        }
+
+        .product-card-fs {
+            background: #1e293b; /* Темно-синий фон карточки как на макете */
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+            aspect-ratio: 1 / 1.25;
+        }
+
+        .product-card-fs.out-of-stock {
+            opacity: 0.55;
+        }
+
+        .product-image-fs {
+            width: 100%;
+            height: 75%;
+            position: relative;
+            background: #0f172a;
+        }
+
+        .product-image-fs img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .out-of-stock-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .product-info-fs {
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            color: #ffffff;
+            flex-grow: 1;
+        }
+
+        .product-title-price {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .product-title-fs {
+            font-size: 13px;
+            font-weight: 600;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 110px;
+        }
+
+        .product-price-fs {
+            font-size: 13px;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+
+        .btn-add-fs {
+            background: #ffffff;
+            color: #1e293b;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .btn-add-fs:disabled {
+            background: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* ПЛАВАЮЩАЯ КОРЗИНА СНИЗУ (черточка) */
+        .floating-cart-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1e293b;
+            color: white;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .floating-cart-bar::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 36px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 2px;
+        }
+
+        .cart-info-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .cart-badge-count {
+            background: var(--accent);
+            color: white;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .cart-total-right {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        /* МОДАЛЬНОЕ ОКНО КОРЗИНЫ */
+        .cart-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+        }
+
+        .cart-modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cart-modal {
+            background: #ffffff;
+            width: 100%;
+            max-width: 550px;
+            max-height: 85vh;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            color: #1e293b;
+        }
+
+        .cart-modal-overlay.open .cart-modal {
+            transform: translateY(0);
+        }
+
+        .cart-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .cart-modal-header h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .btn-close-modal {
+            background: #f1f5f9;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .cart-items-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cart-item-details {
+            flex-grow: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .cart-item-price {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 8px;
+        }
+
+        .qty-btn {
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-remove {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .customer-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .customer-form input, .customer-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            box-sizing: border-box;
+            font-family: inherit;
+            background: #f8fafc;
+        }
+
+        .total-block {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            padding-top: 8px;
+            border-top: 2px solid var(--border);
+        }
+
+        .btn-whatsapp {
+            width: 100%;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-whatsapp:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+        }
+        
+        .loading-msg {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="full-screen-container">
+        <!-- 1. ВЕРХНЯЯ ПАНЕЛЬ (Маленькие квадратики категорий для быстрого переключения) -->
+        <div id="top-categories-container" class="top-categories-scroll">
+            <div class="loading-msg">Загрузка...</div>
+        </div>
+
+        <!-- 2. ОСНОВНАЯ СЕТКА ТОВАРОВ НА ВЕСЬ ЭКРАН -->
+        <div id="products-fullscreen-grid" class="products-grid-fullscreen">
+            <div class="loading-msg" style="grid-column: span 2;">Загрузка товаров из таблицы...</div>
+        </div>
+    </div>
+
+    <!-- ПЛАВАЮЩАЯ КОРЗИНА СНИЗУ -->
+    <div class="floating-cart-bar" onclick="toggleCartModal(true)">
+        <div class="cart-info-left">
+            🛒 <span>Корзина</span>
+            <span id="floating-cart-count" class="cart-badge-count">0</span>
+        </div>
+        <div id="floating-cart-total" class="cart-total-right">0 ₸</div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО КОРЗИНЫ -->
+    <div id="cart-modal-overlay" class="cart-modal-overlay" onclick="handleOverlayClick(event)">
+        <div class="cart-modal">
+            <div class="cart-modal-header">
+                <h3>Ваша корзина</h3>
+                <button class="btn-close-modal" onclick="toggleCartModal(false)">✕</button>
+            </div>
+
+            <div id="cart-items" class="cart-items-list">
+                <div class="loading-msg">Корзина пока пуста</div>
+            </div>
+
+            <div class="total-block">
+                <span>Итого:</span>
+                <span id="modal-total-price">0 ₸</span>
+            </div>
+
+            <div class="customer-form">
+                <input type="text" id="customer-name" placeholder="Ваше имя *" required>
+                <input type="tel" id="customer-phone" placeholder="Ваш телефон *" required>
+                <input type="text" id="customer-address" placeholder="Адрес доставки (город, улица, дом) *" required>
+                <textarea id="customer-comment" rows="2" placeholder="Комментарий к заказу (необязательно)"></textarea>
+            </div>
+
+            <button id="whatsapp-btn" class="btn-whatsapp" onclick="sendToWhatsApp()" disabled>
+                Оформить заказ в WhatsApp
+            </button>
+        </div>
+    </div>
+
+<script>
+    const WHATSAPP_PHONE = "77770123722";
+    const SHEET_ID = "1xca-gkawPkyAtQ8McQGuXIZ7upj9gQHSrvW61Er2X7I";
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+    let products = [];
+    let cart = [];
+    let selectedCategory = "";
+    let lastKnownCategory = "Другие модели";
+
+    function formatDriveImageUrl(url) {
+        if (!url) return "https://via.placeholder.com/300x300?text=Шарф";
+        const match = url.match(/[-\w]{25,}/);
+        if (url.includes("drive.google.com") && match) {
+            return `https://drive.google.com/thumbnail?id=${match[0]}&sz=w600`;
+        }
+        return url;
+    }
+
+    function checkInStock(statusText) {
+        if (!statusText) return false;
+        const normalized = statusText.toLowerCase().trim();
+        if (normalized.includes("нет") || normalized.includes("законч") || normalized === "0" || normalized === "false") {
+            return false;
+        }
+        return true;
+    }
+
+    async function loadProductsFromSheet() {
+        try {
+            const response = await fetch(SHEET_URL);
+            const text = await response.text();
+            const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+            const data = JSON.parse(jsonText);
+            const rows = data.table.rows;
+
+            products = [];
+            rows.forEach((row, index) => {
+                const nameCell = row.c[0]?.v ? String(row.c[0].v).trim() : "";
+                if (!nameCell || nameCell.toLowerCase().startsWith("название")) return;
+
+                const rawPrice = row.c[1]?.v ?? row.c[1]?.f ?? 0;
+                const numericPrice = Number(String(rawPrice).replace(/[^\d.]/g, "")) || 0;
+                const rawPhoto = row.c[3]?.v ? String(row.c[3].v).trim() : "";
+                const rawStatus = row.c[4]?.v ? String(row.c[4].v).trim() : "";
+                const rawCategory = row.c[5]?.v ? String(row.c[5].v).trim() : "";
+
+                if (rawCategory) {
+                    lastKnownCategory = rawCategory;
+                }
+
+                products.push({
+                    id: index + 1,
+                    name: nameCell,
+                    price: numericPrice,
+                    image: formatDriveImageUrl(rawPhoto),
+                    inStock: checkInStock(rawStatus),
+                    category: rawCategory || lastKnownCategory
+                });
+            });
+
+            const categoryNames = [...new Set(products.map(p => p.category))];
+            if (categoryNames.length > 0) {
+                selectedCategory = categoryNames[0]; // Выбираем первую категорию по умолчанию
+            }
+
+            renderUI();
+        } catch (error) {
+            console.error("Ошибка загрузки:", error);
+            document.getElementById('products-fullscreen-grid').innerHTML = `
+                <div class="loading-msg" style="color: #ef4444; grid-column: span 2;">
+                    Не удалось загрузить данные из таблицы. Проверьте доступ.
+                </div>
+            `;
+        }
+    }
+
+    function isAuthorCategory(catName) {
+        const lower = catName.toLowerCase();
+        return lower.includes("авторские платки") || lower.includes("авторлік");
+    }
+
+    function selectCategory(catName) {
+        selectedCategory = catName;
+        renderUI();
+    }
+
+    function renderUI() {
+        const categoryNames = [...new Set(products.map(p => p.category))];
+        const topContainer = document.getElementById('top-categories-container');
+        const gridContainer = document.getElementById('products-fullscreen-grid');
+
+        // 1. Рендер верхней панели маленьких квадратиков
+        topContainer.innerHTML = categoryNames.map(cat => {
+            const itemsInCat = products.filter(p => p.category === cat);
+            let icon = itemsInCat[0]?.image || "https://via.placeholder.com/150";
+            if (isAuthorCategory(cat)) {
+                icon = "38036-removebg-preview.png"; // Имя файла для авторских платков из GitHub
+            }
+            const isActive = cat === selectedCategory ? 'active' : '';
+            const safeCat = cat.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
+            return `
+                <div class="top-cat-item ${isActive}" onclick="selectCategory('${safeCat}')">
+                    <div class="top-cat-box">
+                        <img src="${icon}" alt="${cat}">
+                    </div>
+                    <div class="top-cat-title">${cat}</div>
+                </div>
+            `;
+        }).join('');
+
+        // 2. Рендер основной сетки товаров выбранной категории на весь экран
+        const filteredProducts = products.filter(p => p.category === selectedCategory);
+
+        if (filteredProducts.length === 0) {
+            gridContainer.innerHTML = '<div class="loading-msg" style="grid-column: span 2;">В этой категории пока нет товаров</div>';
+            return;
+        }
+
+        gridContainer.innerHTML = filteredProducts.map(product => `
+            <div class="product-card-fs ${!product.inStock ? 'out-of-stock' : ''}">
+                <div class="product-image-fs">
+                    <img src="${product.image}" alt="${product.name}" loading="lazy">
+                    ${!product.inStock ? '<div class="out-of-stock-badge">Нет в наличии</div>' : ''}
+                </div>
+                <div class="product-info-fs">
+                    <div class="product-title-price">
+                        <h4 class="product-title-fs" title="${product.name}">${product.name}</h4>
+                        <span class="product-price-fs">${product.price.toLocaleString('ru-RU')} ₸</span>
+                    </div>
+                    <button class="btn-add-fs" 
+                            onclick="addToCart(${product.id})" 
+                            ${!product.inStock ? 'disabled' : ''}>
+                        ${product.inStock ? '+ В корзину' : 'Нет'}
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function toggleCartModal(open) {
+        const overlay = document.getElementById('cart-modal-overlay');
+        if (open) {
+            overlay.classList.add('open');
+        } else {
+            overlay.classList.remove('open');
+        }
+    }
+
+    function handleOverlayClick(event) {
+        if (event.target.id === 'cart-modal-overlay') {
+            toggleCartModal(false);
+        }
+    }
+
+    function addToCart(productId) {
+        const product = products.find(p => p.id === productId);
+        if (!product || !product.inStock) return;
+
+        const existingItem = cart.find(item => item.id === productId);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({ ...product, quantity: 1 });
+        }
+        renderCart();
+    }
+
+    function changeQuantity(productId, delta) {
+        const item = cart.find(i => i.id === productId);
+        if (!item) return;
+
+        item.quantity += delta;
+        if (item.quantity <= 0) {
+            removeFromCart(productId);
+        } else {
+            renderCart();
+        }
+    }
+
+    function removeFromCart(productId) {
+        cart = cart.filter(item => item.id !== productId);
+        renderCart();
+    }
+
+    function renderCart() {
+        const cartEl = document.getElementById('cart-items');
+        const modalTotalEl = document.getElementById('modal-total-price');
+        const floatingCountEl = document.getElementById('floating-cart-count');
+        const floatingTotalEl = document.getElementById('floating-cart-total');
+        const waBtn = document.getElementById('whatsapp-btn');
+
+        let totalCount = 0;
+        let totalSum = 0;
+
+        cart.forEach(item => {
+            totalCount += item.quantity;
+            totalSum += item.price * item.quantity;
+        });
+
+        floatingCountEl.textContent = totalCount;
+        floatingTotalEl.textContent = `${totalSum.toLocaleString('ru-RU')} ₸`;
+
+        if (cart.length === 0) {
+            cartEl.innerHTML = '<div class="loading-msg">Корзина пока пуста</div>';
+            modalTotalEl.textContent = '0 ₸';
+            waBtn.disabled = true;
+            return;
+        }
+
+        waBtn.disabled = false;
+
+        cartEl.innerHTML = cart.map(item => {
+            const itemTotal = item.price * item.quantity;
+            return `
+                <div class="cart-item">
+                    <div class="cart-item-details">
+                        <div class="cart-item-title">${item.name}</div>
+                        <div class="cart-item-price">${item.price.toLocaleString('ru-RU')} ₸ × ${item.quantity} = <b>${itemTotal.toLocaleString('ru-RU')} ₸</b></div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" onclick="changeQuantity(${item.id}, -1)">−</button>
+                        <span>${item.quantity}</span>
+                        <button class="qty-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
+                    </div>
+                    <button class="btn-remove" title="Удалить" onclick="removeFromCart(${item.id})">✕</button>
+                </div>
+            `;
+        }).join('');
+
+        modalTotalEl.textContent = `${totalSum.toLocaleString('ru-RU')} ₸`;
+    }
+
+    function sendToWhatsApp() {
+        if (cart.length === 0) return;
+
+        const name = document.getElementById('customer-name').value.trim();
+        const phone = document.getElementById('customer-phone').value.trim();
+        const address = document.getElementById('customer-address').value.trim();
+        const comment = document.getElementById('customer-comment').value.trim();
+
+        if (!name || !phone || !address) {
+            alert("Пожалуйста, заполните имя, телефон и адрес доставки!");
+            return;
+        }
+
+        let message = `🧾 *НОВЫЙ ЗАКАЗ (ЧЕК)*\n`;
+        message += `------------------------\n`;
+
+        let totalSum = 0;
+        cart.forEach((item, index) => {
+            const itemSum = item.price * item.quantity;
+            totalSum += itemSum;
+            message += `${index + 1}. *${item.name}*\n`;
+            message += `   Цена: ${item.price.toLocaleString('ru-RU')} ₸ × ${item.quantity} шт. = ${itemSum.toLocaleString('ru-RU')} ₸\n`;
+        });
+
+        message += `------------------------\n`;
+        message += `💰 *ИТОГО: ${totalSum.toLocaleString('ru-RU')} ₸*\n\n`;
+        message += `👤 *Данные покупателя:*\n`;
+        message += `• Имя: ${name}\n`;
+        message += `• Телефон: ${phone}\n`;
+        message += `• Адрес: ${address}\n`;
+        if (comment) {
+            message += `• Комментарий: ${comment}\n`;
+        }
+
+        const encodedMessage = encodeURIComponent(message);
+        window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encodedMessage}`, '_blank');
+    }
+
+    // Загружаем данные из Google Таблицы при старте
+    loadProductsFromSheet();
+</script>
+
+</body>
+</html>
