@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Im'diva — Каталог</title>
+    <title>Im'diva — Эксклюзивные шарфы и платки</title>
     <style>
         :root {
             --primary: #1e293b;
             --accent: #25D366;
-            --bg: #f8fafc;
+            --bg: #ffffff;
             --border: #e2e8f0;
             --text-muted: #64748b;
         }
@@ -24,104 +24,220 @@
             align-items: center;
         }
 
-        .full-screen-container {
+        .main-container {
             width: 100%;
-            max-width: 600px;
-            min-height: 100vh;
-            background: #ffffff;
+            max-width: 500px;
             box-sizing: border-box;
-            padding: 16px 16px 100px 16px;
+            padding: 24px 16px 90px 16px;
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
 
-        /* ВЕРХНЯЯ ГОРИЗОНТАЛЬНАЯ ПАНЕЛЬ КАТЕГОРИЙ (маленькие квадратики) */
-        .top-categories-scroll {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-            scrollbar-width: none; /* Скрыть скроллбар для красоты */
-        }
-        .top-categories-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        .top-cat-item {
-            flex: 0 0 auto;
-            width: 70px;
+        /* 1. Логотип сверху */
+        .top-logo-wrap {
             text-align: center;
-            cursor: pointer;
+            margin-bottom: 20px;
         }
 
-        .top-cat-box {
-            width: 70px;
-            height: 70px;
+        .logo-img {
+            width: 150px;
+            height: 75px;
+            object-fit: contain;
+        }
+
+        /* 2. Блок для видео (3 вертикальных прямоугольника) */
+        .video-section {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .video-box {
+            width: 100%;
+            aspect-ratio: 9 / 16;
+            background: #1e293b;
             border-radius: 14px;
-            background: #1e293b; /* Тот самый темно-синий цвет из макета */
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid transparent;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            transition: all 0.2s;
+            color: #ffffff;
+            font-size: 11px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: relative;
         }
 
-        .top-cat-item.active .top-cat-box {
-            border-color: #25D366;
-            transform: scale(1.05);
-        }
-
-        .top-cat-box img {
+        .video-box video, .video-box iframe {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border: none;
         }
 
-        .top-cat-title {
-            font-size: 11px;
-            font-weight: 600;
-            margin-top: 6px;
+        /* Разделительная линия */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 24px;
+        }
+
+        /* Шапка каталога / категорий */
+        .catalog-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .catalog-header h2 {
+            margin: 0;
+            font-size: 18px;
             color: var(--primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        /* ОСНОВНАЯ СЕТКА ТОВАРОВ НА ВЕСЬ ЭКРАН (большие квадраты) */
-        .products-grid-fullscreen {
+        .btn-back {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 3. Сетка категорий 3х3 (как на макете) */
+        .categories-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            aspect-ratio: 1 / 1.2;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+
+        .category-icon {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            background: #f8fafc;
+            padding: 2px;
+        }
+
+        .category-name {
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.25;
+            color: var(--primary);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .category-count {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        /* Верхняя мини-панель категорий внутри раздела товаров */
+        .top-categories-bar {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+            scrollbar-width: none;
+        }
+        .top-categories-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .top-cat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .top-cat-pill.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .top-cat-pill img {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Сетка товаров */
+        .products-grid {
             width: 100%;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            flex-grow: 1;
+            gap: 12px;
         }
 
-        .product-card-fs {
-            background: #1e293b; /* Темно-синий фон карточки как на макете */
-            border-radius: 20px;
+        .product-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            position: relative;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-            aspect-ratio: 1 / 1.25;
         }
 
-        .product-card-fs.out-of-stock {
+        .product-card.out-of-stock {
             opacity: 0.55;
         }
 
-        .product-image-fs {
-            width: 100%;
-            height: 75%;
+        .product-image-wrap {
             position: relative;
-            background: #0f172a;
+            width: 100%;
+            height: 180px;
+            background: #f8fafc;
         }
 
-        .product-image-fs img {
+        .product-image-wrap img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -133,78 +249,102 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(15, 23, 42, 0.85);
             color: #ffffff;
-            padding: 8px 14px;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 11px;
             white-space: nowrap;
         }
 
-        .product-info-fs {
-            padding: 10px 12px;
+        .product-body {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .product-title {
+            font-weight: 600;
+            font-size: 13px;
+            margin: 0 0 8px 0;
+        }
+
+        .product-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #1e293b;
-            color: #ffffff;
-            flex-grow: 1;
         }
 
-        .product-title-price {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .product-price {
+            font-weight: 800;
+            font-size: 14px;
         }
 
-        .product-title-fs {
-            font-size: 13px;
-            font-weight: 600;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 110px;
-        }
-
-        .product-price-fs {
-            font-size: 13px;
-            font-weight: 700;
-            color: #38bdf8;
-        }
-
-        .btn-add-fs {
-            background: #ffffff;
-            color: #1e293b;
+        .btn-add {
+            background: var(--primary);
+            color: white;
             border: none;
             padding: 6px 10px;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 12px;
+            font-weight: 600;
         }
 
-        .btn-add-fs:disabled {
-            background: #475569;
-            color: #94a3b8;
+        .btn-add:disabled {
+            background: #cbd5e1;
             cursor: not-allowed;
         }
 
-        /* ПЛАВАЮЩАЯ КОРЗИНА СНИЗУ (черточка) */
+        /* 4. Информация о бренде в самом низу */
+        .brand-info-box {
+            width: 100%;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+            margin-top: 10px;
+        }
+
+        .brand-info-box h3 {
+            margin: 0 0 6px 0;
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        .brand-info-box p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .instagram-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            color: #E1306C;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Плавающая корзина (черточка снизу) */
         .floating-cart-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: #1e293b;
+            background: var(--primary);
             color: white;
             padding: 14px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-sizing: border-box;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
             cursor: pointer;
             z-index: 1000;
         }
@@ -244,7 +384,7 @@
             margin-top: 4px;
         }
 
-        /* МОДАЛЬНОЕ ОКНО КОРЗИНЫ */
+        /* Модальное окно корзины */
         .cart-modal-overlay {
             position: fixed;
             top: 0;
@@ -279,7 +419,6 @@
             transform: translateY(100%);
             transition: transform 0.3s ease;
             overflow-y: auto;
-            color: #1e293b;
         }
 
         .cart-modal-overlay.open .cart-modal {
@@ -414,22 +553,51 @@
         .loading-msg {
             text-align: center;
             color: var(--text-muted);
-            padding: 30px 0;
-            font-size: 14px;
+            padding: 20px 0;
+            font-size: 13px;
         }
     </style>
 </head>
 <body>
 
-    <div class="full-screen-container">
-        <!-- 1. ВЕРХНЯЯ ПАНЕЛЬ (Маленькие квадратики категорий для быстрого переключения) -->
-        <div id="top-categories-container" class="top-categories-scroll">
-            <div class="loading-msg">Загрузка...</div>
+    <div class="main-container">
+        <!-- 1. Логотип сверху -->
+        <div class="top-logo-wrap">
+            <img src="37918-removebg-preview.png" alt="Im'diva Logo" class="logo-img">
         </div>
 
-        <!-- 2. ОСНОВНАЯ СЕТКА ТОВАРОВ НА ВЕСЬ ЭКРАН -->
-        <div id="products-fullscreen-grid" class="products-grid-fullscreen">
-            <div class="loading-msg" style="grid-column: span 2;">Загрузка товаров из таблицы...</div>
+        <!-- 2. Блок видео -->
+        <div id="video-section" class="video-section">
+            <div class="video-box">Скоро видео</div>
+            <div class="video-box">Скоро видео</div>
+            <div class="video-box">Скоро видео</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Шапка каталога / категорий -->
+        <div class="catalog-header">
+            <h2 id="catalog-heading">Категории товаров</h2>
+            <button id="back-btn" class="btn-back" onclick="showCategories()" style="display: none;">
+                ← Назад
+            </button>
+        </div>
+
+        <!-- 3. Динамический контент (Категории или товары) -->
+        <div id="catalog-content" style="width: 100%;">
+            <div class="loading-msg">Загрузка каталога из таблицы...</div>
+        </div>
+
+        <div class="divider" style="margin-top: 30px;"></div>
+
+        <!-- 4. Информация о бренде в самом низу -->
+        <div class="brand-info-box">
+            <h3>Im'diva</h3>
+            <p><b>Алматы</b> • Онлайн-магазин</p>
+            <p>📞 8 707 778 76 61</p>
+            <a href="https://instagram.com/d_iva_brand" target="_blank" class="instagram-link">
+                📷 d_iva_brand
+            </a>
         </div>
     </div>
 
@@ -478,7 +646,9 @@
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
     let products = [];
+    let videos = [];
     let cart = [];
+    let currentView = 'categories';
     let selectedCategory = "";
     let lastKnownCategory = "Другие модели";
 
@@ -509,8 +679,17 @@
             const rows = data.table.rows;
 
             products = [];
+            videos = [];
+
             rows.forEach((row, index) => {
                 const nameCell = row.c[0]?.v ? String(row.c[0].v).trim() : "";
+                
+                // Столбец G (индекс 6) — Ссылка на видео (если заполнено)
+                const videoCell = row.c[6]?.v ? String(row.c[6].v).trim() : "";
+                if (videoCell) {
+                    videos.push(videoCell);
+                }
+
                 if (!nameCell || nameCell.toLowerCase().startsWith("название")) return;
 
                 const rawPrice = row.c[1]?.v ?? row.c[1]?.f ?? 0;
@@ -533,20 +712,33 @@
                 });
             });
 
-            const categoryNames = [...new Set(products.map(p => p.category))];
-            if (categoryNames.length > 0) {
-                selectedCategory = categoryNames[0]; // Выбираем первую категорию по умолчанию
-            }
-
-            renderUI();
+            renderVideos();
+            showCategories();
         } catch (error) {
             console.error("Ошибка загрузки:", error);
-            document.getElementById('products-fullscreen-grid').innerHTML = `
-                <div class="loading-msg" style="color: #ef4444; grid-column: span 2;">
+            document.getElementById('catalog-content').innerHTML = `
+                <div class="loading-msg" style="color: #ef4444;">
                     Не удалось загрузить данные из таблицы. Проверьте доступ.
                 </div>
             `;
         }
+    }
+
+    function renderVideos() {
+        const videoSection = document.getElementById('video-section');
+        let html = '';
+        for (let i = 0; i < 3; i++) {
+            if (videos[i]) {
+                html += `
+                    <div class="video-box">
+                        <video src="${videos[i]}" autoplay muted loop playsinline></video>
+                    </div>
+                `;
+            } else {
+                html += `<div class="video-box">Скоро видео</div>`;
+            }
+        }
+        videoSection.innerHTML = html;
     }
 
     function isAuthorCategory(catName) {
@@ -554,63 +746,90 @@
         return lower.includes("авторские платки") || lower.includes("авторлік");
     }
 
-    function selectCategory(catName) {
-        selectedCategory = catName;
-        renderUI();
-    }
+    function showCategories() {
+        currentView = 'categories';
+        document.getElementById('catalog-heading').textContent = "Категории товаров";
+        document.getElementById('back-btn').style.display = "none";
 
-    function renderUI() {
+        const container = document.getElementById('catalog-content');
         const categoryNames = [...new Set(products.map(p => p.category))];
-        const topContainer = document.getElementById('top-categories-container');
-        const gridContainer = document.getElementById('products-fullscreen-grid');
 
-        // 1. Рендер верхней панели маленьких квадратиков
-        topContainer.innerHTML = categoryNames.map(cat => {
-            const itemsInCat = products.filter(p => p.category === cat);
-            let icon = itemsInCat[0]?.image || "https://via.placeholder.com/150";
-            if (isAuthorCategory(cat)) {
-                icon = "38036-removebg-preview.png"; // Имя файла для авторских платков из GitHub
+        if (categoryNames.length === 0) {
+            container.innerHTML = '<div class="loading-msg">Категории не найдены</div>';
+            return;
+        }
+
+        const cardsHtml = categoryNames.map(catName => {
+            const itemsInCat = products.filter(p => p.category === catName);
+            let coverImage = itemsInCat[0]?.image || "https://via.placeholder.com/150";
+            if (isAuthorCategory(catName)) {
+                coverImage = "38036-removebg-preview.png";
             }
-            const isActive = cat === selectedCategory ? 'active' : '';
-            const safeCat = cat.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            const safeCatName = catName.replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
             return `
-                <div class="top-cat-item ${isActive}" onclick="selectCategory('${safeCat}')">
-                    <div class="top-cat-box">
-                        <img src="${icon}" alt="${cat}">
-                    </div>
-                    <div class="top-cat-title">${cat}</div>
+                <div class="category-card" onclick="openCategory('${safeCatName}')">
+                    <img class="category-icon" src="${coverImage}" alt="${catName}">
+                    <div class="category-name">${catName}</div>
+                    <div class="category-count">${itemsInCat.length} шт.</div>
                 </div>
             `;
         }).join('');
 
-        // 2. Рендер основной сетки товаров выбранной категории на весь экран
-        const filteredProducts = products.filter(p => p.category === selectedCategory);
+        container.innerHTML = `<div class="categories-grid">${cardsHtml}</div>`;
+    }
 
-        if (filteredProducts.length === 0) {
-            gridContainer.innerHTML = '<div class="loading-msg" style="grid-column: span 2;">В этой категории пока нет товаров</div>';
-            return;
-        }
+    function openCategory(catName) {
+        currentView = 'products';
+        selectedCategory = catName;
+        document.getElementById('catalog-heading').textContent = catName;
+        document.getElementById('back-btn').style.display = "inline-block";
 
-        gridContainer.innerHTML = filteredProducts.map(product => `
-            <div class="product-card-fs ${!product.inStock ? 'out-of-stock' : ''}">
-                <div class="product-image-fs">
+        const container = document.getElementById('catalog-content');
+        const categoryNames = [...new Set(products.map(p => p.category))];
+
+        const topBarHtml = `
+            <div class="top-categories-bar">
+                ${categoryNames.map(cat => {
+                    const items = products.filter(p => p.category === cat);
+                    let icon = items[0]?.image || "";
+                    if (isAuthorCategory(cat)) {
+                        icon = "38036-removebg-preview.png";
+                    }
+                    const isActive = cat === selectedCategory ? 'active' : '';
+                    const safeCat = cat.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    return `
+                        <div class="top-cat-pill ${isActive}" onclick="openCategory('${safeCat}')">
+                            ${icon ? `<img src="${icon}" alt="">` : ''}
+                            <span>${cat}</span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+
+        const filtered = products.filter(p => p.category === catName);
+        const productsHtml = filtered.map(product => `
+            <div class="product-card ${!product.inStock ? 'out-of-stock' : ''}">
+                <div class="product-image-wrap">
                     <img src="${product.image}" alt="${product.name}" loading="lazy">
                     ${!product.inStock ? '<div class="out-of-stock-badge">Нет в наличии</div>' : ''}
                 </div>
-                <div class="product-info-fs">
-                    <div class="product-title-price">
-                        <h4 class="product-title-fs" title="${product.name}">${product.name}</h4>
-                        <span class="product-price-fs">${product.price.toLocaleString('ru-RU')} ₸</span>
+                <div class="product-body">
+                    <h4 class="product-title">${product.name}</h4>
+                    <div class="product-footer">
+                        <span class="product-price">${product.price.toLocaleString('ru-RU')} ₸</span>
+                        <button class="btn-add" 
+                                onclick="addToCart(${product.id})" 
+                                ${!product.inStock ? 'disabled' : ''}>
+                            ${product.inStock ? '+ В корзину' : 'Нет'}
+                        </button>
                     </div>
-                    <button class="btn-add-fs" 
-                            onclick="addToCart(${product.id})" 
-                            ${!product.inStock ? 'disabled' : ''}>
-                        ${product.inStock ? '+ В корзину' : 'Нет'}
-                    </button>
                 </div>
             </div>
         `).join('');
+
+        container.innerHTML = topBarHtml + `<div class="products-grid">${productsHtml}</div>`;
     }
 
     function toggleCartModal(open) {
@@ -744,7 +963,6 @@
         window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encodedMessage}`, '_blank');
     }
 
-    // Загружаем данные из Google Таблицы при старте
     loadProductsFromSheet();
 </script>
 
